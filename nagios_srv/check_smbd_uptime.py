@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-rt os,sys
+import os,sys
 
 x = os.popen("ps -e -o pid,comm,etime | grep -m 1 \"\<smbd\>\"").read()
 
