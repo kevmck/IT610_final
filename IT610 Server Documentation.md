@@ -41,7 +41,7 @@ sudo timedatectl set-timezone America/New_York
 Ensure that all devices are correctly networked to properly communicate with each other.
 
 ### Identify a backup location/code repository
-Create a location where you can store all default configurations, in case you need to revert any changes made. If you do not plan to complete this step, you can ignore all steps indicated with (!).
+Create a location where you can store all default configurations, in case you need to revert any changes made. If you do not plan to complete this step, go with God.
 
 ### Nagios Server
 Install Nagios on Server_1 by running the following commands:
@@ -62,7 +62,7 @@ sudo cp /etc/nagios3/conf.d/localhost_nagios2.cfg /etc/nagios3/conf.d/[Server_3]
 
 Edit each newly created host file, replacing the hostname and address values with the corresponding values of the servers you will be monitoring.
 
-Restart Nagios and ensure that the newly monitored servers are reflected in the web interface::
+Restart Nagios and ensure that the newly monitored servers are reflected in the web interface:
 
 ```bash
 sudo service nagios3 restart
@@ -98,7 +98,18 @@ sudo service smbd restart
 
 Download the plugins from this repository (in nagios_srv/), and copy them to /usr/lib/nagios/plugins
 
-Edit the /etc/nagios-nr
+Copy the commands.cfg and localhost_nagios2.cfg files to /etc/nagios3/ and make the appropriate changes to match your current values (e.g. IP addresses).
+
+To configure email, install ssmtp:
+
+```bash
+sudo apt-get install ssmtp
+```
+
+Copy the ssmtp.conf file from the Git repository, and place it in /etc/ssmtp/
+From there, open and edit the file to match your SMTP server's settings.
+
+To test that email notifications work, end a service that Nagios is monitoring, or shut down one of the servers.
 
 ### Apache Server
 Install Nagios Agent and Apache:
@@ -111,6 +122,7 @@ sudo apt-get install apache2
 Check that Apache is up by navigating to the IP address of the server.
 
 **NOTE: If you are using AWS, navigate to the public IP address.**
+
 
 ### MySQL Server
 Install Nagios Agent and MySQL:
@@ -133,13 +145,16 @@ CREATE USER nagios IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON *.* TO 'nagios'@'%';
 ```
 
-Back up the /etc/mysql/mysql.conf.d/mysqld.cnf file
-
-Comment out the single line corresponding to the bind address in the mysqld.cnf file. This will allow for remote connections to the server from any IP address.
-
-Log into MySQL and run the following command:
+Back up the /etc/mysql/mysql.conf.d/mysqld.cnf file, then edit the original. Comment out the single line corresponding to the bind address in the mysqld.cnf file. This will allow for remote connections to the server from any IP address.
 
 
 Restart MySQL
-Create backup script:
-Automate it with cron:
+
+```bash
+sudo service mysqld restart
+```
+
+Copy the sqlbackup.sh script from sql_srv/ in Git, and place it in your home directory.
+
+Edit the script to include the information for your database, and the location you wish to store all backups.
+Add this script to the crontab file, setting the frequency of backups to your specified value.
